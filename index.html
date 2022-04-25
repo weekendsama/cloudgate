@@ -32,7 +32,7 @@
             if (JSON.stringify(getUrlParams()) == '{}') {
                 defaultYear = '2022'
                 defaultType = '4月春'
-                history.pushState({}, {}, `?year=${defaultYear}&type=${defaultType}`);
+                history.pushState({}, {}, `index.html?year=${defaultYear}&type=${defaultType}`);
 
             } else {
                 defaultYear = decodeURI(getUrlParams().year)
@@ -96,7 +96,7 @@
                                 let clickedYear = thisYear
                                 let clickedType = this.id.replace('type-', '')
                                 let backParams = `year=${thisYearNumber}&type=${clickedType}`
-                                history.pushState({}, {}, `?${backParams}`); // 更新地址栏
+                                history.pushState({}, {}, `index.html?${backParams}`); // 更新地址栏
                                 getAnimeList(clickedYear, clickedType)
                                 $('#posters').hide()
                                 setTimeout(() => { $('#posters').fadeIn(300) }, 500); // 番剧列表动画
