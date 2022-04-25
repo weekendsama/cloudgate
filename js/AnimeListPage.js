@@ -300,8 +300,8 @@ $(document).ready(function () {
         var urlLabel =
             `
             <div id="urlLabel" class="mt-3">
-                <h5 class="mb-3">直链 (点击复制) <span id="copy-success" class=""> ✅ 复制成功! </span></h5> 
-                <button style="max-width: 100%" class="copy btn btn-sm btn-outline-primary text-truncate" data-clipboard-text="${thisFileUrl}">${thisFileUrl}</button>
+                <h5 class="mb-3">直链 <span id="copy-success" class=""> ✅ 复制成功! </span></h5> 
+                <button style="max-width: 100%" class="copy btn btn-sm btn-outline-primary text-truncate" data-clipboard-text="${thisFileUrl}">点此复制下载链接</button>
             </div>
             `
         var downloadBtn =
