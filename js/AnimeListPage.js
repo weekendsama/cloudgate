@@ -11,7 +11,7 @@ $(document).ready(function () {
         "bangumiApi": "https://bgm-api.5t5.top/v0/subjects/"
     }
 
-    console.log('地址栏参数数据: ', getUrlParams());
+    console.log('地址栏参数数据: ', getUrlParams())
 
     if (getUrlParams().la == undefined) {
         console.log("地址栏不含参数! ")
@@ -31,7 +31,7 @@ $(document).ready(function () {
         axios(config.api.url + '/v1/anime/id/' + thisPageId)
             .then((result) => {
                 thisPageAnimeData = result.data.data
-                console.log('成功取得番剧库 API 数据：', thisPageAnimeData);
+                console.log('成功取得番剧库 API 数据：', thisPageAnimeData)
                 // 填充路径
                 let arrowIcon = ' <i class="bi bi-arrow-right-short"></i> '
                 let pathHtml = thisPageAnimeData.year + arrowIcon + thisPageAnimeData.type + arrowIcon + thisPageAnimeData.name
@@ -43,10 +43,18 @@ $(document).ready(function () {
                 $("#views").empty().append(` 播放 ${thisPageAnimeData.views} 次`)
                 // 特效，渐变展示头部卡片
                 $('#la-anime-header').fadeIn()
-                // 进行接下来的操作
-                getBangumiApi()
-                getAgefans()
-                getRelatins()
+
+                if (thisPageAnimeData.bgmid != '000000') { // 如果这个番剧是一个 Bangumi 番剧
+                    getBangumiApi() // 获取 Bangumi 番剧的 API 数据并显示在页面上
+                    getAgefans() // 获取 Agefans 番剧的数据并显示在页面上
+                    getRelatins() // 获取相关番剧的数据并显示在页面上
+                } else { // 如果这个番剧不是一个 Bangumi 番剧
+                    $('#name_cn').append(thisPageAnimeData.title)
+                    $('#rating-box, #eps-box, #show-more').hide()
+                    $('#more-link').empty().append('<span class="fw-lighter text-secondary">本作是 Bangumi 未收录番剧 （或者可能根本不是一个影视作品！）</span>')
+                    $('#bg').css('background-image', 'url(https://anime-img.5t5.top/assets/no-bgm-bg.jpg/bg)')
+                }
+                getFileList() // 打印文件列表
             })
 
         function getBangumiApi() {
@@ -54,8 +62,7 @@ $(document).ready(function () {
             axios(config.bangumiApi + thisPageAnimeData.bgmid)
                 .then((result) => {
                     thisPageBangumiData = result.data; // 此界面的 Bangumi 数据
-                    getFileList()
-                    console.log('成功取得 Bangumi API Data：', thisPageBangumiData);
+                    console.log('成功取得 Bangumi API Data：', thisPageBangumiData)
 
                     $("#bangumi").attr("href", "https://bgm.tv/subject/" + thisPageBangumiData.id) // 设置番组计划链接
                     if (thisPageBangumiData.name_cn == undefined || thisPageBangumiData.name_cn == '') { // 如果没有中文名, 则使用原名
@@ -104,7 +111,7 @@ $(document).ready(function () {
             axios("https://anime-img.5t5.top/api/agefans/anime.min.json")
                 .then((result) => {
                     let agefansData = result.data
-                    console.log('成功取得 Agefans Data：', agefansData);
+                    console.log('成功取得 Agefans Data：', agefansData)
                     let agefansId = ''
                     for (var i = 0; i < agefansData.length; i++) {
                         if (agefansData[i].id == thisPageAnimeData.bgmid) {
@@ -119,7 +126,7 @@ $(document).ready(function () {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    console.log(error)
                     if (error) $("#agefans").empty().append('<i class="bi bi-slash-circle"></i> Agefans API 故障')
                 })
         }
@@ -128,7 +135,7 @@ $(document).ready(function () {
             axios(config.api.url + '/v1/anime/relations/' + thisPageAnimeData.bgmid)
                 .then((result) => {
                     let relationsData = result.data.data
-                    console.log('成功取得关联数据：', relationsData);
+                    console.log('成功取得关联数据：', relationsData)
                     for (let i = 0; i < relationsData.length; i++) {
                         axios(config.api.url + '/v1/anime/bgm/' + relationsData[i].id)
                             .then((result) => {
@@ -156,15 +163,12 @@ $(document).ready(function () {
                                 }
                             })
                     }
-                })
-                .catch((error) => {
-                    console.error(error);
-                })
+                }).catch((error) => { console.error(error) })
         }
 
 
 
-        var leftViews = 2; // 一次打开页面后, 可以增加的播放量上限
+        var leftViews = 2 // 一次打开页面后, 可以增加的播放量上限
         function addView() {
             if (leftViews > 0) {
                 axios(config.api.url + '/v1/view/add/' + getUrlParams().la)
@@ -174,8 +178,7 @@ $(document).ready(function () {
                         if (data.code == 0) {
                             $(`#views`).empty().append(` 播放 ${data.data} 次`)
                             leftViews--
-                        }
-                        else {
+                        } else {
                             console.log('更新播放量失败: ', data)
                             $(`#views`).empty().append(` 获取失败`)
                         }
@@ -188,21 +191,21 @@ $(document).ready(function () {
             axios(config.api.url + '/v1/anime/list/' + thisPageId)
                 .then((result) => {
                     let fileList = result.data.data
-                    console.log('成功取得文件列表：', fileList);
+                    console.log('成功取得文件列表：', fileList)
                     if (fileList.length == 0) { // 如果没有文件列表
+                        console.log('文件列表为空!')
                         let airDate = thisPageBangumiData.date ? thisPageBangumiData.date : '未知 / 暂未定档' // 如果 Bangumi 有提供放送日期, 则提取放送日期
                         setTimeout(() => {
-                            $("#la-list-container").append("<div style='opacity: 85%;' class='alert alert-info'><span>熔岩云盘返回列表为空, 此番组目录下尚无任何资源! <br>" + "请确认此作品已经开始连载, 根据 Bangumi Wiki, 本作的开始放送日期为: " + airDate + "<br><a class='alert-link' href='./index.html'>返回主页</a></span></div>")
+                            $("#la-list-container").append("<div style='opacity: 85%;' class='alert alert-info'><span>熔岩云盘返回列表为空, 此番组目录下尚无任何资源! <br>" + "请确认此作品已经开始连载, 根据 Bangumi Wiki, 本作的开始放送日期为: " + airDate + "<br><a class='alert-link' href='./index.html'>返回主页</a></span></div>").fadeIn()
                             $("#loading").fadeOut()
                             $('#rating-box').hide() // 如果没有资源(通常是未开播), 则隐藏评分框
                         }, 1500);
-                    }
-                    else {
+                    } else {
                         // 获取字典并开始生成列表
                         axios('./assets/dict.json')
                             .then((result) => {
                                 dict = result.data
-                                console.log('成功取得词典：', dict);
+                                console.log('成功取得词典：', dict)
                                 for (let i = 0; i < fileList.length; i++) {
                                     let thisFile = fileList[i]
                                     printAnimeList(thisFile, i)
@@ -213,7 +216,7 @@ $(document).ready(function () {
         }
     }
     function printAnimeList(thisFile, thisFileId) { // i 用作 HTML ID
-        // console.log('开始生成番剧列表: ', thisFile);
+        // console.log('开始生成番剧列表: ', thisFile)
 
         let thisFileName = thisFile.name
         let thisFileSize = thisFile.size
@@ -252,57 +255,81 @@ $(document).ready(function () {
         // 模板
         var mp4HelpMessage =
             `
-            <p id="mp4HelpMessage" class="mb-0"><p class="text-secondary" style="font-size: 14px">
-                黑屏 / 无法播放？可能是浏览器不支持 H.265 编码, <br>请使用下方的按钮调用外部播放器。
+            <p id="mp4HelpMessage" class="mb-0"><p class="text-secondary fw-light" style="font-size: 14px">
+                黑屏 / 无法播放？可能是浏览器不支持 HEVC 编码, <br>请使用下方的按钮调用外部播放器。
             </p></p>
             `
         var mkvHelpMessage =
             `
-            <div id="mkvHelpMessage" class="mb-1">
+            <div id="mkvHelpMessage" class="mb-1 fw-light">
                 浏览器不支持当前格式 (MKV), 请使用外部播放器来播放。
                 <div class="text-secondary" style="font-size: 14px">
-                    这是由于大部分均无法支持 H.265 格式及 MKV 格式内封的字幕。需要调用您设备上的播放软件播放。
-                    <br>同时也可以复制链接后使用弹弹 Play 播放效果更佳。
+                    这是由于大部分浏览器均无法支持 HEVC 格式及 MKV 格式内封的字幕。
+                    <br>需要调用您设备上的播放软件播放。
                 </div>
-                <a class="text-decoration-none fw-bold" href="./help.html">>> 查看外部播放器安装使用帮助 <<<a/>
+                <a class="text-decoration-none" href="./help.html">查看外部播放器安装使用帮助<a/>
             </div>
-            <a id="mkvPlayerBtn" class="btn btn-sm btn-outline-primary mb-4 mt-0">强制用浏览器打开（不支持内封字幕和 HEVC）</a>
+            <a id="mkvPlayerBtn" class="btn btn-sm btn-outline-secondary mb-4 mt-0">强制用浏览器打开（不支持内封字幕和 HEVC）</a>
             `
-        var mkvPlayerBtn =
-            ``
         var otherPlayers =
             `
-            <h5 class="mb-3">外部播放器</h5>
-            <div class="row row-cols-5" id="otherPlayers">
-                <a class="text-decoration-none text-secondary" href="ddplay:${encodeURIComponent(thisFileUrl)}">
-                    <img class="img-fluid mx-auto d-block" style="width: 60%; padding: 2px;" src="./assets/dandanplay.webp" alt="DandanPlay"/>
-                    <div class="text-center" style="font-size: 12px;">弹弹Play (Win)</div>
-                </a>
-                <a class="text-decoration-none text-secondary" href="potplayer://${thisFileUrl}">
-                    <img class="img-fluid mx-auto d-block" style="width: 60%;" src="./assets/PotPlayer.svg" alt="PotPlayer"/>
-                    <div class="text-center" style="font-size: 12px;">PotPlayer</div>
-                </a>
-                <a class="text-decoration-none text-secondary" href="vlc://${thisFileUrl}">
-                    <img class="img-fluid mx-auto d-block" style="width: 60%;" src="./assets/vlc.svg" alt="VLC"/>
-                    <div class="text-center" style="font-size: 12px;">VLC</div>
-                </a>
-                <a class="text-decoration-none text-secondary" href="iina://weblink?url=${thisFileUrl}">
-                    <img class="img-fluid mx-auto d-block" style="width: 60%;" src="./assets/iina.svg" alt="IINA"/>
-                    <div class="text-center" style="font-size: 12px;">IINA</div>
-                </a>
-                <a class="text-decoration-none text-secondary" href="${thisFileUrl}">
-                    <img class="img-fluid mx-auto d-block" style="width: 60%;" src="./assets/download.svg" alt="IINA"/>
-                    <div class="text-center" style="font-size: 12px;">下载</div>
-                </a>
+            <h5 class="mb-2">外部播放</h5>
+            <div class="container-fluid p-0" id="otherPlayers">
+                <!-- 列表 -->
+                <ul class="list-group list-group-flush">
+                    <!-- 弹弹 -->
+                    <li class="list-group-item px-0">
+                        <a href="ddplay:${encodeURIComponent(thisFileUrl + "|filePath=" + thisFileName)}" class="text-decoration-none">
+                            <img src="../assets/dandanplay.webp" style="height: 30px;" class="mx-1">
+                            <span class="text-secondary fw-light align-middle mx-1">弹弹Play (Windows) <span class="badge bg-secondary ms-2">现已支持弹幕</span></span>
+                        </a>
+                    </li>
+                    <!-- Pot / VLC -->
+                    <li class="list-group-item px-0 d-flex">
+                        <a href="potplayer://${thisFileUrl}" class="text-decoration-none w-50">
+                            <img src="../assets/PotPlayer.svg" style="height: 30px;" class="mx-1">
+                            <span class="text-secondary fw-light align-middle mx-1">PotPlayer</span>
+                        </a>
+                        <a href="vlc://${thisFileUrl}" class="text-decoration-none w-50">
+                            <img src="../assets/vlc.svg" style="height: 30px;" class="mx-1">
+                            <span class="text-secondary fw-light align-middle mx-1">VLC</span>
+                        </a>
+                    </li>
+                    <!-- IINA / Download -->
+                    <li class="list-group-item px-0 d-flex">
+                        <a href="iina://weblink?url=${thisFileUrl}" class="text-decoration-none w-50">
+                            <img src="../assets/iina.svg" style="height: 30px;" class="mx-1">
+                            <span class="text-secondary fw-light align-middle mx-1">IINA</span>
+                        </a>
+                        <a href="${thisFileUrl}" class="text-decoration-none w-50">
+                            <img src="../assets/download.svg" style="height: 30px;" class="mx-1">
+                            <span class="text-secondary fw-light align-middle mx-1">下载</span>
+                        </a>
+                    </li>
+                    <!-- 复制直链 -->
+                    <li class="list-group-item px-0" style="cursor:pointer" id="urlLabel">
+                        <div class="text-decoration-none">
+                            <img src="../assets/link.svg" style="height: 30px;" class="mx-1">
+                            <span class="text-secondary fw-light align-middle mx-1 copy" data-clipboard-text="${thisFileUrl}">复制直链 <span
+                                id="copy-info" class="badge bg-secondary ms-2">点击复制</span></span>
+                        </div>
+                    </li>
+                </ul>
             </div>
             `
 
         var urlLabel =
             `
-            <div id="urlLabel" class="mt-3">
-                <h5 class="mb-3">直链 <span id="copy-success" class=""> ✅ 复制成功! </span></h5> 
-                <button style="max-width: 100%" class="copy btn btn-sm btn-outline-primary text-truncate" data-clipboard-text="${thisFileUrl}">点此复制下载链接</button>
-            </div>
+            <!-- 复制直链 -->
+            <ul class="list-group list-group-flush" >
+                <li class="list-group-item px-0" style="cursor:pointer" id="urlLabel">
+                    <div class="text-decoration-none">
+                        <img src="../assets/link.svg" style="height: 30px;" class="mx-1">
+                        <span class="text-secondary fw-light align-middle mx-1 copy" data-clipboard-text="${thisFileUrl}">复制直链 <span
+                            id="copy-info" class="badge bg-secondary ms-2">点击复制</span></span>
+                    </div>
+                </li>
+            </ul>
             `
         var downloadBtn =
             `
@@ -327,13 +354,13 @@ $(document).ready(function () {
             },
         })
         if (thisFileType == 'mp4') {
-            $("#la-player-body").empty().append(mp4HelpMessage + otherPlayers + urlLabel) // 加入操作按钮
+            $("#la-player-body").empty().append(mp4HelpMessage + otherPlayers) // 加入操作按钮
             addView() // 如果视频正常，则添加播放量
         }
         if (thisFileType == 'mkv') {
             dp.destroy()
-            $("#la-player-body").empty().append(mkvHelpMessage + otherPlayers + urlLabel)
-            $('#otherPlayers, #urlLabel').click(() => { // 点击第三方播放器
+            $("#la-player-body").empty().append(mkvHelpMessage + otherPlayers)
+            $('#otherPlayers > ul > li > a, #urlLabel').click(() => { // 点击第三方播放器
                 addView()
             })
             $("#mkvPlayerBtn").click(() => { // 强制用浏览器打开
@@ -381,24 +408,25 @@ $(document).ready(function () {
         })
 
         // 增加剪贴板复制
-        $("#copy-success").hide()
         var clipboard = new ClipboardJS('.copy', {
             container: document.getElementById('la-player')
-        });
+        })
 
+        // 复制成功提示
         clipboard.on('success', function (e) {
-            console.info('复制操作:', e.action);
-            console.info('文本:', e.text);
-            console.info('触发器:', e.trigger);
-            $("#copy-success").fadeIn()
-            setTimeout(() => { $("#copy-success").fadeOut() }, 3000)
+            console.info('复制操作:', e.action)
+            console.info('文本:', e.text)
+            console.info('触发器:', e.trigger)
+            $("#copy-info").empty().append("复制成功").removeClass("bg-secondary").addClass('bg-success')
 
-        });
+        })
 
+        // 复制失败提示
         clipboard.on('error', function (e) {
-            console.error('复制操作失败:', e.action);
-            console.error('触发器:', e.trigger);
-        });
+            console.error('复制操作失败:', e.action)
+            console.error('触发器:', e.trigger)
+            $("#copy-info").empty().append("复制失败，请右键上方 [下载] 按钮选择复制链接").removeClass("bg-secondary").addClass('bg-danger')
+        })
 
     }
 
