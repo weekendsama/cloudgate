@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>番剧库 - 搜索</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
+    <!-- Assets -->
+    <link href="https://anime.magmablock.top/style/scrollbar.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://anime.magmablock.top/style/toolbar.css" rel="stylesheet" crossorigin="anonymous">
+    </link>
+    <script src="https://anime.magmablock.top/js/getUrlParams.js" crossorigin="anonymous"></script>
+    <script src="https://anime.magmablock.top/js/PrintAnimeList.js" crossorigin="anonymous"></script>
+    <script src="https://anime.magmablock.top/js/search.js" crossorigin="anonymous"></script>
+    <script src="https://anime.magmablock.top/js/Navbar.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="navbar"></div>
+    <div class="container mt-4">
+        <div class="mx-3">
+            <h1 class="display-3">搜索</h1>
+            <p class="fw-light">目前支持名称或 Bangumi ID。</p>
+            <!-- 搜索框 -->
+            <div class="input-group mb-3">
+                <input id="search-label" type="text" class="form-control" style="border-radius: .25rem 0 0 .25rem;" placeholder="搜索 番剧名称 或 Bangumi ID">
+                <button id="search" class="btn btn-primary" type="button"><i class="bi bi-search"></i></button>
+            </div>
+            <script>
+                $('#search').click(function () { // 点击搜索按钮
+                    goSearch()
+                })
+
+                $('#search-label').change(function () { // 搜索框内容改变时
+                    goSearch()
+                }).keydown(function (e) {
+                    if (e.keyCode == 13) goSearch()
+                })
+            </script>
+
+        </div>
+        <div id="search-result-container"></div>
+        <div style="height: 150px;"></div>
+    </div>
+
+</body>
+
+
+</html>
