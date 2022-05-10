@@ -249,7 +249,7 @@ function getFileList() {
                 console.log('文件列表为空!')
                 let airDate = thisPageBangumiData.date ? thisPageBangumiData.date : '未知 / 暂未定档' // 如果 Bangumi 有提供放送日期, 则提取放送日期
                 setTimeout(() => {
-                    $("#la-list-container").append("<div style='opacity: 85%;' class='alert alert-info'><span>熔岩云盘返回列表为空, 此番组目录下尚无任何资源! <br>" + "请确认此作品已经开始连载, 根据 Bangumi Wiki, 本作的开始放送日期为: " + airDate + "<br><a class='alert-link' href='./index.html'>返回主页</a></span></div>").fadeIn()
+                    $("#la-list-container").append("<div style='opacity: 85%;' class='alert alert-info'><span>云盘返回列表为空, 此番组目录下尚无任何资源! <br>" + "请确认此作品已经开始连载, 根据 Bangumi Wiki, 本作的开始放送日期为: " + airDate + "<br><a class='alert-link' href='./index.html'>返回主页</a></span></div>").fadeIn()
                     $("#loading").fadeOut()
                     $('#rating-box').hide() // 如果没有资源(通常是未开播), 则隐藏评分框
                 }, 1500);
