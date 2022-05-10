@@ -2,27 +2,6 @@ $(document).ready(() => {
     const navbarHtml =
         `
         <!-- 顶栏 -->
-        <style>
-            #topbar div div:nth-child(1) a,
-            #notice-top {
-                transition: 0.3s;
-            }
-    
-            #topbar div div:nth-child(1) a.text-secondary:hover,
-            #notice-top:hover {
-                color: #303030 !important;
-            }
-    
-            #search-label-top,
-            #search-top {
-                transition: 0.3s;
-            }
-    
-            #search-label-top:hover {
-                background: rgba(255, 255, 255, 0.8) !important;
-            }
-        </style>
-    
         <nav id="topbar" class="navbar navbar-light shadow-sm fixed-top border-bottom border-1 rounded-bottom"
             style="backdrop-filter: blur(9px) brightness(0.85); background-color: rgba(255, 255, 255, 0.7);">
             <div class="container-fluid px-4" style="max-width: 1320px">
@@ -94,10 +73,7 @@ $(document).ready(() => {
         </nav>`
 
     const toolBar =
-        `<div class="toolbar">
-            <div class="toolButton goTopButton" style="opacity: 0;"><i class="bi bi-arrow-up-circle fs-5"></i></div>
-            <div class="toolButton searchButton"><span><i class="bi bi-search fs-5"></i></span><input class="form-control" placeholder="搜索 番剧名称 或 Bangumi ID"></div>
-        </div>`
+        `<div class="toolbar"><div class="toolButton goTopButton" style="opacity: 0;"><i class="bi bi-arrow-up-circle fs-5"></i></div></div>`
     const icon = {
         home: "bi-house",
         index: "bi-collection",
@@ -133,7 +109,7 @@ $(document).ready(() => {
     function goSearch() {
         let text = $('#search-label-top').val()
         if (text == '') window.location.href = './search.html'
-        else window.location.href = './search.html?name=' + encodeURIComponent(text)
+        else window.location.href = './search.html?q=' + encodeURIComponent(text)
     }
 
     // 检查是否需要显示回到顶部
@@ -148,19 +124,36 @@ $(document).ready(() => {
         $("body,html").animate({ scrollTop: '0' }, 100)
     })
 
-    // 搜索框的行为
     $(".searchButton input").keydown(function (e) {
         if (e.keyCode == 13 && $(".searchButton input").val() != "")
-            window.location.href = './search.html?name=' + $(".searchButton input").val()
+            window.location.href = './search.html?q=' + $(".searchButton input").val()
 
     })
 
     // 点击搜索框的行为
     $(".searchButton span").click(function () {
         if ($(".searchButton")[0].clientWidth > 180 && $(".searchButton input").val() != "")
-            window.location.href = './search.html?name=' + $(".searchButton input").val()
+            window.location.href = './search.html?q=' + $(".searchButton input").val()
     })
 
     // 根据设置判断是否需要隐藏右下角按钮
     $(".toolbar").css("display", localStorage.getItem("hideToolBar") == "true" ? "none" : "")
+
+    const statistics = `
+    <img src="https://www.bfcounter.vip/generatepic?userid=ce1d3f3b-ce67-4319-8222-e751f8262b2e"
+        alt="Page Counter" class="visually-hidden">
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?c3b6ee9c2eff1642f7465f8e97766227";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+    <script async defer 
+        data-website-id="5aad3d7c-6372-42aa-957e-ed4c945c0d08"
+        src="https://umami.magma.ink/umami.js"></script>
+    `
+    $("body").append(statistics)
 })
