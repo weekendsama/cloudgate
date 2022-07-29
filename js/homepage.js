@@ -14,7 +14,7 @@ $(document).ready(() => {
             let href = (data[i].url) ? `href="${data[i].url}"` : ''
             html +=
                 `
-                <a class="carousel-item ${activeClass}" ${href} style="background-image: url(${encodeURIComponent(data[i].pic)});">
+                <a class="carousel-item ${activeClass}" ${href} style="background-image: url(${data[i].pic});" data-bs-interval="10000">
                     <img src="${data[i].pic}" class="d-block w-100">
                     <div class="carousel-caption d-block">
                         <h5>${data[i].title}</h5>
@@ -24,7 +24,7 @@ $(document).ready(() => {
                 `
         }
         element.append(html)
-    }
+            }
 
     async function getCollections() {
         /*
@@ -32,14 +32,14 @@ $(document).ready(() => {
         */
         const config = {
             "api": { "url": "https://anime-api.5t5.top" }
-        }
+  }
 
         const collections = (await axios('./assets/data/homepage-collections.json')).data;
 
         /*
             根据 Collections 数据生成推荐番剧列表，思路: 拿到每个 Collection 后，先遍历 content，生成一个骨架
             再把标题等内容填入渲染为 HTML。接着再遍历 content，让异步回调将数据填入骨架。
- 
+
             有够麻烦的 什么时候学 Vue
         */
         for (let i = 0; i < collections.length; i++) { // 遍历全部番剧推荐
@@ -53,7 +53,7 @@ $(document).ready(() => {
                     <div id="collectionBlock-${thisCollection.id}-${thisCollectionBlock.index}" class="LavaAnimeCollectionBlock mb-3"></div>`
             }
             let thisCollectionHtml = // HTML 骨架
-                `<div class="card">
+                `<div class="card mb-3">
                     <div class="card-body">
                         <h1 class="display-5">${thisCollection.title}</h1>
                         <p class="text-muted fw-light">${thisCollection.subtitle}</p>
@@ -61,7 +61,7 @@ $(document).ready(() => {
                     </div>
                 </div>`
             $('#collections').append(thisCollectionHtml) // 渲染骨架
-        }
+    }
 
         collections.forEach(function(thisCollection,i){ // 第二次遍历，主要是调用 API 填入番剧
             // thisCollection  当前推荐番剧组
@@ -89,8 +89,8 @@ $(document).ready(() => {
                                 e.preventDefault() // 阻止浏览器默认方法
                             }
                         }, false)
-                    })
-                })
+  })
+})
             })
         })
     }

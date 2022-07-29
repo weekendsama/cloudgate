@@ -4,7 +4,7 @@ const config = {
     "bangumiApi": "https://bgm-api.5t5.top/v0/subjects/"
 }
 
-var thisPageId
+var thisPageId, thisPageAnimeData, thisPageBangumiData
 
 $(document).ready(async function () {
 
@@ -23,6 +23,8 @@ $(document).ready(async function () {
             let arrowIcon = '<i class="bi bi-arrow-right-short"></i>'
             let pathHtml = thisPageAnimeData.year + arrowIcon + thisPageAnimeData.type + arrowIcon + thisPageAnimeData.name
             $("#la-path").empty().append(pathHtml)
+      // 修改网页标题
+      $('title').text($('title').text().replace("番剧库", thisPageAnimeData.title))
             // 修改背景图
             if (thisPageAnimeData.poster != undefined) {
                 backgroundUrl = thisPageAnimeData.poster.replace('/poster', '/bg')
@@ -247,9 +249,19 @@ function getFileList() {
             console.log('成功取得文件列表：', fileList)
             if (fileList.length == 0) { // 如果没有文件列表
                 console.log('文件列表为空!')
-                let airDate = thisPageBangumiData.date ? thisPageBangumiData.date : '未知 / 暂未定档' // 如果 Bangumi 有提供放送日期, 则提取放送日期
+                let airDate = thisPageAnimeData.type ? thisPageAnimeData.year + thisPageAnimeData.type : '未知 / 暂未定档' // 如果有提供放送日期, 则提取放送日期
                 setTimeout(() => {
-                    $("#la-list-container").append("<div style='opacity: 85%;' class='alert alert-info'><span>云盘返回列表为空, 此番组目录下尚无任何资源! <br>" + "请确认此作品已经开始连载, 根据 Bangumi Wiki, 本作的开始放送日期为: " + airDate + "<br><a class='alert-link' href='./index.html'>返回主页</a></span></div>").fadeIn()
+          $("#la-list-container")
+            .append(
+              `<div style="opacity: 85%;" class="alert alert-info">
+                <span>
+                  暂时还未在此番剧 / 作品下找到资源，可能的原因是：<br>
+                  此作品尚未上映、尚无资源或番剧库尚未入库。<br>
+                  请确认此作品已经上映, 根据 Bangumi Wiki, 本作的开始放送日期为: ${airDate}<br>
+                  <a class='alert-link' href='./index.html'>返回主页</a>
+                </span>
+              </div>`
+            ).fadeIn()
                     $("#loading").fadeOut()
                     $('#rating-box').hide() // 如果没有资源(通常是未开播), 则隐藏评分框
                 }, 1500);
@@ -258,11 +270,10 @@ function getFileList() {
                 axios('./assets/dict.json')
                     .then((result) => {
                         dict = result.data
-                        console.log('成功取得词典：', dict)
-                        for (let i = 0; i < fileList.length; i++) {
-                            let thisFile = fileList[i]
+            // console.log('成功取得词典：', dict)
+            fileList.forEach((thisFile, i) => {
                             printAnimeList(thisFile, i)
-                        }
+            })
                     })
             }
         })
@@ -280,21 +291,131 @@ function printAnimeList(thisFile, thisFileId) { // i 用作 HTML ID
     if (thisFile.type == 'file') { // 如果是文件, 则设置为后缀名
         if (thisFileName.match('.')) thisFileType = thisFileName.split('.').pop() // 提取文件后缀名
 
-        let tagedName = thisFile.name
-        for (let i = 0; i < dict.length; i++) { // 对文件名进行标签化
-            fromRegExp = new RegExp(dict[i].from, 'gi') // 新建一个正则变量
-            toHtml = ' <span class="badge ' + dict[i].class + '">' + dict[i].to + '</span> '
-            tagedName = tagedName.replace(fromRegExp, toHtml) // 替换
-        }
-        tagedName = tagedName.replace(/\[|\]/g, " ") // 标签替换完成后, 再空格所有的 '[' ']'
+    // 对文件名进行标签化
+    function tagName(fileName, dict) {
 
-        let thisFileHTML = `
-        <button style="opacity:0.85" id="${thisFileId}" type="button" data-bs-toggle="modal" data-bs-target="#la-player" class="la-list-anime list-group-item list-group-item-action">
-        ${tagedName}<br>
-        <div id="${thisFileId}-raw" class="text-secondary fw-lighter" style="font-size: 12px">
-        ${thisFileName}
-        </div>
-        </button>`
+      // 先进行简单拆分，只用 [ ] & + 拆开文件名
+      let splitedFileName = fileName.split(/\[|\]|&|\+/); // 拆分
+      for (let i = 0; i < splitedFileName.length; i++) { // 对文件名中的每个词进行判断
+        splitedFileName[i] = splitedFileName[i].trim() // 去除首尾空格
+        if (splitedFileName[i] == '') {
+          splitedFileName.splice(i, 1) // 去除空元素
+          i = i - 1;
+        }
+      }
+
+      // 判断前三个词是否是发布组名
+      let groupNames = new Array(); // 找到的发布组名会存在此内
+      let forTimes = splitedFileName.length >= 3 ? 3 : splitedFileName.length - 1; // 如果文件名长度大于等于3, 则只判断前三个词
+      for (let i = 0; i < forTimes; i++) { // 把数组的前三个元素和发布组的词典进行比对，这已是发布组名可能出现位置的极限
+        for (let j = 0; j < dict.length; j++) { // 遍历词典
+          // 如果词典中的词是发布组词，且匹配成功
+          if (dict[j].class == 'group' && splitedFileName[i].match(new RegExp(dict[j].from, 'i'))) {
+            groupNames.push(dict[j].to) // 将发布组词添加到 groupNames 中
+            splitedFileName.splice(i, 1) // 删除匹配成功的词
+            i = i - 1; // 因为删除了一个元素, 所以 i 减 1
+            break;
+          }
+        }
+      }
+
+      // 将文件名拼回来，然后拆的更散
+      let reformedFileName = ''
+      for (let i = 0; i < splitedFileName.length; i++) {
+        if (i < splitedFileName.length) reformedFileName = reformedFileName + splitedFileName[i] + "|";
+        if (i == splitedFileName.length) reformedFileName = reformedFileName + splitedFileName[i];
+      }
+      reformedFileName = reformedFileName.split(/\||\(|\)|-|_|,| /) // 这次用 | ( ) - _ , 还有空格拆开
+      for (let i = 0; i < reformedFileName.length; i++) { // 对文件名中的每个词进行判断
+        reformedFileName[i] = reformedFileName[i].trim() // 去除首尾空格
+        if (reformedFileName[i] == '') {
+          reformedFileName.splice(i, 1) // 去除空元素
+          i = i - 1;
+        }
+      }
+
+      // 开始用词典进行标签化
+      for (let i = 0; i < reformedFileName.length; i++) {
+        for (let j = 0; j < dict.length; j++) {
+          let thisRegExp = new RegExp(dict[j].from, 'i')
+          if (reformedFileName[i].replace(thisRegExp, '').trim() == '') {
+            // console.log('原文: ', reformedFileName[i]);
+            // console.log("正则: ", dict[j].from, "匹配: ", match)
+            reformedFileName[i] = {
+              tag: dict[j].to,
+              from: reformedFileName[i],
+              type: dict[j].class,
+              regExp: thisRegExp
+            };
+            break;
+          }
+        }
+      }
+
+      // 开始识别文件集数
+      let thisFileEpisode // 此处是 undefined，如果后面匹配失败，则是 null
+
+      for (let i = reformedFileName.length; i > 0; i--) { // 习惯情况下均为集数在后，所以从后往前匹配
+        if (typeof reformedFileName[i] == 'string') { // 如果是字符串
+          // ↓ 这里是当前遍历的，被上面的算法识别完成后仍然为字符串的元素，顺带删除 S02 / S2 这种季度标
+          let thisString = reformedFileName[i].replace(/S\d{1,2}/i, '');
+          // 集数匹配算法，匹配 1-2 位数字
+          thisFileEpisode = thisString.match(/(EP|E|P|)\d{1,2}(END|v2|v3|.5|)/i);
+          if (thisFileEpisode) { // 如果匹配成功
+            if (thisFileEpisode[0] != thisFileEpisode.input) {
+              console.log('丢弃非全匹配', ` ${thisFileEpisode[0]} => ${thisFileEpisode.input}`);
+              thisFileEpisode = null; // 如果不是全匹配，丢弃
+              continue;
+            }
+            thisFileEpisode = thisFileEpisode[0];
+            thisFileEpisode = thisFileEpisode.replace(/v2|v3|END|EP|E|P/gi, '')
+            break;
+          }
+        }
+      }
+
+      if (thisFileEpisode == undefined || thisFileEpisode == null) { // Failed
+        thisFileEpisode = '';
+      }
+      let noEpisode = !(thisFileName.endsWith('.mkv') || thisFileName.endsWith('.mp4')); // 仅 mkv 或 mp4 文件识别集数才有意义
+      if (noEpisode) thisFileEpisode = ''
+
+      return { groupNames, reformedFileName, thisFileEpisode }; // 返回发布组名和标签化的文件名
+    }
+
+    let tagedNameObject = tagName(thisFileName, dict); // 标签化文件名，是包含两个对象的数组
+    console.log('匹配结果: ', tagedNameObject);
+    let tagedName = '' // 根据上面内容生成的HTML
+    for (let i in tagedNameObject.groupNames) { // 生成组名
+      tagedName = tagedName + `<span class="badge bg-primary">${tagedNameObject.groupNames[i]}</span> `;
+    }
+    for (let i in tagedNameObject.reformedFileName) { // 生成文件名
+      let thisElement = tagedNameObject.reformedFileName[i];
+      if (typeof thisElement == 'string') {
+        tagedName = tagedName + thisElement + ' ';
+      }
+      if (typeof thisElement == 'object') {
+        let className = {
+          "quality": "bg-secondary",
+          "source": "bg-success",
+          "version": "bg-light text-dark",
+          "language": "bg-info text-dark",
+          "other": "bg-secondary",
+          "format": "bg-dark text-light",
+          "unknow": "bg-warning"
+        }
+        className = className[thisElement.type] || className.unknow;
+        tagedName = tagedName + `<span class="badge ${className}">${thisElement.tag}</span> `;
+      }
+
+    }
+
+    // 生成文件列表的 HTML
+    let thisFileHTML = $('#file-element-template').html();
+    thisFileHTML = thisFileHTML.replace(/\{\{id\}\}/g, thisFileId);
+    thisFileHTML = thisFileHTML.replace(/\{\{tagedName\}\}/g, tagedName);
+    thisFileHTML = thisFileHTML.replace(/\{\{rawName\}\}/g, thisFileName);
+    thisFileHTML = thisFileHTML.replace(/\{\{ep\}\}/g, tagedNameObject.thisFileEpisode);
         $("#la-list-container").append(thisFileHTML)
         $(`#${thisFileId}`).on('click', () => {
             onFileClick(thisFileName, thisFileType, thisFileUrl, thisFileTempUrl)
@@ -332,11 +453,14 @@ function onFileClick(thisFileName, thisFileType, thisFileUrl, thisFileTempUrl) {
             <!-- 列表 -->
             <ul class="list-group list-group-flush">
                 <!-- 弹弹 -->
-                <li class="list-group-item px-0">
-                    <a href="ddplay:${encodeURIComponent(thisFileUrl + "|filePath=" + thisFileName)}" class="text-decoration-none">
+                <li class="list-group-item px-0 d-flex">
+                    <span class="text-decoration-none w-50">
                         <img src="../assets/dandanplay.webp" style="height: 30px;" class="mx-1">
-                        <span class="text-secondary fw-light align-middle mx-1">弹弹Play (Windows) <span class="badge bg-secondary ms-2">现已支持弹幕</span></span>
-                    </a>
+                        <span class="text-secondary fw-light align-middle mx-1">弹弹Play<span class="badge bg-secondary ms-2">弹幕</span>
+                        </span>
+                    </span>
+                    <a class="text-decoration-none fw-light my-auto mx-1 w-25 text-center" href="ddplay:${encodeURIComponent(thisFileUrl + "|filePath=" + thisFileName)}" >Windows 端</a>
+                    <a class="text-decoration-none fw-light my-auto mx-1 w-25 text-center" href="intent:${thisFileUrl}#Intent;package=com.xyoye.dandanplay;end">Android 端</a>
                 </li>
                 <!-- Pot / VLC -->
                 <li class="list-group-item px-0 d-flex">
@@ -409,9 +533,12 @@ function onFileClick(thisFileName, thisFileType, thisFileUrl, thisFileTempUrl) {
         },
     })
 
+  dp.on('play', function () {
+    addView();
+  });
+
     if (thisFileType == 'mp4') {
         $("#la-player-body").empty().append(mp4HelpMessage + otherPlayers) // 加入操作按钮
-        addView() // 如果视频正常，则添加播放量
     }
     if (thisFileType == 'mkv') {
         dp.destroy()
