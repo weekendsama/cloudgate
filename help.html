@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>番剧库 - 使用帮助</title>
+    <!-- jQuery -->
+    <script src="https://cdn.staticfile.org/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.staticfile.org/twitter-bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.staticfile.org/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Clipboard.js -->
+    <script src="https://cdn.staticfile.org/clipboard.js/2.0.10/clipboard.min.js"></script>
+    <!-- Axios -->
+    <script src="https://cdn.staticfile.org/axios/0.26.1/axios.min.js"></script>
+  <!-- Sweetalert2 -->
+  <script src="https://cdn.staticfile.org/ajax/libs/limonte-sweetalert2/11.4.8/sweetalert2.all.min.js"></script>
+  <!-- Assets -->
+  <link href="./style/scrollbar.css" rel="stylesheet" crossorigin="anonymous">
+  <link href="./style/toolbar.css" rel="stylesheet" crossorigin="anonymous">
+  </link>
+  <script src="./js/Navbar.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div id="navbar"></div>
+  <div class="container mt-4 mb-5">
+    <div class="mx-3">
+      <div style="display: flex; align-items: center;">
+        <h1 class="display-3">帮助</h1>
+        <div style="margin-left: 25px;">
+          <div class="toolButton settingsButton">
+            <i class="bi bi-gear fs-5"></i>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h5 class="lead my-3">外部播放器使用指南</h5>
+        <div class="accordion-item fw-light">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#help-1-1">
+              为什么要使用外部播放器？
+            </button>
+          </h2>
+          <div id="help-1-1" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <p>HEVC/H.265 编码格式具有高压缩比的特点，其通常会和内封 ASS 字幕同时被打包在 .MKV 格式内被各大字幕组发布。番剧库内此类资源约有 30% 左右。</p>
+              <p>但根据
+                <a class="text-decoration-none" target="_blank" href="https://caniuse.com/?search=hevc">Can I Use</a>
+                网站的统计，当前主流的浏览器除 Safari 外均不能正常的支持 HEVC/H.265
+                格式的视频解码。
+              </p>
+              <p>此外，浏览器内也难以实现 ASS 字幕的播放，因此番剧库需要您使用外部播放器来播放 MKV 和部分 MP4 资源。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item fw-light">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed fw-bold" data-bs-toggle="collapse" data-bs-target="#help-1-2">
+              可用的外部播放器列表？
+            </button>
+          </h2>
+          <div id="help-1-2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <h5>移动端</h5><strong>Android</strong>
+              <ul>
+                <li class="fw-bolder">VLC (安装即用)</li><a target="_blank" class="text-decoration-none"
+                  href="https://get.videolan.org/vlc-android/">VLC For
+                  Android 官网 (最新的 ARM64 即可)</a>
+                <li class="fw-bolder">弹弹 Play (需手动复制链接)</li><a target="_blank" class="text-decoration-none"
+                  href="https://gitee.com/xyoye/DanDanPlayForAndroid/releases">弹弹 Play 概念版
+                  (Android)</a>
+              </ul>
+              <strong>iOS</strong>
+              <ul>
+                <li class="fw-bolder">VLC（安装即用）<br><a class="text-decoration-none"
+                    href="https://apps.apple.com/app/apple-store/id650377962" target="_blank">App
+                    Store</a></li>
+              </ul>
+              <strong>使用自己的播放器</strong>
+              <ul>
+                <li>您也可以“复制链接”后在自己的播放器中播放，需要<strong>支持网络串流和字幕功能</strong>，如安卓端的弹弹 Play 可加载弹幕追番，Magma
+                  目前一直在用~</li>
+              </ul>
+
+              <h5>桌面端</h5><strong>Windows</strong><br>
+              <ul>
+                <li class="fw-bolder">PotPlayer （安装即用）</li>
+                <a target="_blank" class="text-decoration-none" href="https://potplayer.daum.net/?lang=zh_CN">PotPlayer
+                  官网 (需翻墙)</a>
+                <li>VLC (需补丁，教程见下条帮助)</li>
+                <a target="_blank" class="text-decoration-none" href="https://www.videolan.org/vlc/">VLC
+                  官网</a>
+              </ul>
+              <strong>MacOS</strong>
+              <ul>
+                <li>IINA （安装即用）</li><a target="_blank" class="text-decoration-none" href="https://iina.io/">IINA 官网</a>
+              </ul>
+              Linux
+              <ul>
+                <li>VLC (需补丁，请自行安装后前往<a class="text-decoration-none" target="_blank"
+                    href="https://github.com/stefansundin/vlc-protocol/tree/master/linux">此仓库</a>安装补丁。)
+                </li>
+              </ul>
+
+
+
+
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item fw-light">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#help-1-3">
+              如何为 VLC 安装补丁？
+            </button>
+          </h2>
+          <div id="help-1-3" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <p>由于 VLC Media Player 未在电脑端提供官方支持浏览器调用，因此我们需要打个补丁。<br>（如无特殊需求您可直接使用 PotPlayer）</p>
+              <h5>Windows 系统</h5>
+              <ul style="list-style-type: decimal;">
+                <li>
+                  打开 VLC 的安装根目录（默认为 C:\Program Files\VideoLAN\VLC）
+                </li>
+                <li>
+                  将压缩包解压到 VLC 的安装根目录，右击 “vlc-protocol-register.bat”，以<strong>管理员身份运行</strong>。
+                </li>
+                <li>
+                  <a href="vlc://https://pan.5t5.top/api/v3/file/source/2561664/%5BAirota%5D%5BMajo%20no%20Tabitabi%5D%5B07%5D%5BBDRip%201080p%20HEVC-10bit%20FLAC%20ASS%5D.mkv?sign=dCTIRldU4Mc9FcoKvVBE2-9uKt27mBlJPaphj7OWcaQ%3D%3A0"
+                    target="_blank" class="text-decoration-none">【点击这里测试能否正常调用 VLC 播放资源】</a>
+                </li>
+
+
+              </ul>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h5 class="lead my-3">关于本站点</h5>
+        <div class="accordion-item fw-light">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#help-2-1">
+              番剧库是什么？
+            </button>
+          </h2>
+          <div id="help-2-1" class="accordion-collapse collapse">
+            <div class="accordion-body">
+              <h2 id="-lavaanime">番剧库</h2>
+              <p>本项目创立于 2022 年 3 月，至今<strong>不打算</strong>对公共开放和盈利。</p>
+              <ul>
+                <li>番组数据资源来源<ul>
+                    <li><a href="https://bangumi.github.io/api/#/">Bangumi API</a></li>
+                    <li><a href="https://github.com/czy0729/Bangumi-Subject">Bangumi 条目静态数据快照</a>（By
+                      <a href="https://github.com/czy0729">@czy0729</a>） Sad, jsdelivr 国区炸了
+                    </li>
+                  </ul>
+                </li>
+                <li>一个勉强能用的前端<ul>
+                    <li><a href="https://getbootstrap.com/">BootStrap5</a> , 一个知名的 CSS 框架。</li>
+                    <li><a href="https://jquery.com/">JQuery</a>，主要用来完成 ajax 操作，希望未来能够学会 React。</li>
+                    <li><a href="https://github.com/DIYgod/DPlayer">Dplayer</a>，用于在网页中播放部分浏览器能够播放的资源。
+                    </li>
+                  </ul>
+                </li>
+                <li>后端<ul>
+                    <li><a href="https://github.com/cloudreve/Cloudreve">Cloudreve</a>，主要用来管理和提供存储的资源。
+                    </li>
+                  </ul>
+                </li>
+                <li>同时感谢各大字幕组！</li>
+              </ul>
+      <h5 class="lead my-3">了解更多</h5>
+      <div class="container row">
+        <div style="max-width: 250px;" class="col border rounded-3 p-3 m-2">
+          <img src="./assets/Bangumi_Logo.png" class="img-fluid" style="max-width: 100px; height: auto;"></img>
+          <div class="lead">Bangumi 番组计划
+          </div>
+          <a class="text-decoration-none fw-lighter" href="https://bgm.tv" target="_blank">资料数据来源</a>
+        </div>
+      </div>
+
+
+    </div>
+    <br><br><br>
+  </div>
+
+  <script>
+    $(".settingsButton").click(function () {
+      let settingsHtml = `<div class="settingsList"style="font-size: 1em;">
+            <input class="form-check-input" type="checkbox" style="margin-top: 15px" id="listHideValue" ${localStorage.getItem("listHide") == "true" ? "checked" : ""}>
+            <label class="form-check-label" id="listHideValueLabel" style="cursor: pointer; width: 87%; margin-top: 10px">放送列表隐藏 10 人以下在看的番剧</label></div>
+            </div>`
+
+      Swal.fire({
+        title: '设置',
+        html: settingsHtml,
+        confirmButtonText: '确定',
+        footer: `<div style="text-align: center;font-size: 1em;">番剧库</a></div>`,
+      })
+      // 放送列表隐藏
+      localStorage.setItem("listHideValue", 10)
+      $("#listHideValue").change(function () {
+        localStorage.setItem("listHide", (localStorage.getItem("listHide") == "true") ? "false" : "true")
+      })
+
+      $("#listHideValueLabel").click(function () {
+        $("#listHideValue").prop("checked", !$("#listHideValue").prop("checked"))
+        localStorage.setItem("listHide", (localStorage.getItem("listHide") == "true") ? "false" : "true")
+      })
+
+    })
+
+
+  </script>
+</body>
+
+
+
+</html>
